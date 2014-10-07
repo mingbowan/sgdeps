@@ -23,8 +23,6 @@ class Sg_deps(object):
             print("\nError: please check your credentials and network connectivity\n")
             exit(1)
         for sg in sgs:
-            if not sg.id:
-                print(sg.name)
             self.sg_by_name[sg.name] = sg.id
             if sg.id not in self.sg_by_id:
                 self.sg_by_id[sg.id] = {}
@@ -47,7 +45,7 @@ class Sg_deps(object):
                 sgid= self.sg_by_name[sg]
             else:
                 print("\nError: cannot find the security group with name or id: " + sg + "\n")
-                return
+                exit(1)
             self._show(sgid, [], [])
         else:
             for sgid in self.sg_by_id:
@@ -101,6 +99,6 @@ if __name__ == "__main__":
                aws_access_key_id = <your_access_key_here>
                aws_secret_access_key = <your_secret_key_here>'''))
     parser.add_argument("--region", choices=map(lambda x: x.name, regions()), help="region connect to")
-    parser.add_argument("security_group", help="security group id or name, id takes precedence, leave empty for all groups", default="", nargs="?")
+    parser.add_argument("security_group", help="security group id or name, id takes precedence, if you have more than one group with same name, this program will show random one, you should use group id instead. leave empty for all groups", default="", nargs="?")
     args=parser.parse_args()
     Sg_deps(args.region).show_sg(args.security_group)
