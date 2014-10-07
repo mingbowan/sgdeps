@@ -13,7 +13,7 @@ pip install boto
 
 # Install
 
-download the single file, 
+download the python file https://raw.githubusercontent.com/mingbowan/sgdeps/master/sgdeps.py 
 
 # configure 
 
