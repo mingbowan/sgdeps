@@ -17,6 +17,7 @@ download the single file,
 
 # configure 
 
+```
 setup your boto credentails.
 
 here's a few options:
@@ -29,6 +30,7 @@ here's a few options:
        [Credentials]
        aws_access_key_id = <your_access_key_here>
        aws_secret_access_key = <your_secret_key_here>
+```
 
 # usage:
 
