@@ -127,18 +127,37 @@ class Sg_deps(object):
             for obj in sorted(self.sg_by_id[sgid]["obj"], key=lambda x: x.service + x.name.lower() + x.id):
                 print("  " + str(obj))
 
-    def show_obsolete_sg(self):
+    def show_eni_only_sg(self, showlist=False):
+        todo = []
+        for sgid in self.sg_by_id:
+            if self.sg_by_id[sgid]["obj"] and not filter(lambda x: x.service != "eni", self.sg_by_id[sgid]["obj"]):
+                todo.append(sgid)
+        if todo:
+            print("\nBelow security group(s) are used by eni but not any of "+ "/".join(filter(lambda x: x!="eni", self.service_list))+" service\n")
+            if showlist:
+                print("\n".join([self._string_sg(x) for x in todo]))
+            else:
+                for sgid in todo:
+                    self.show_sg(sgid)
+        else:
+            print("\nNot found")
+
+    def show_obsolete_sg(self, showlist=False):
         todo = []
         for sgid in self.sg_by_id:
             if not self.sg_by_id[sgid]["obj"]:
                 todo.append(sgid)
         if todo:
             print("\nBelow security group(s) are not used by any "+ "/".join(self.service_list)+" service\n")
-            print("\n".join([self._string_sg(x) for x in todo]))
+            if showlist:
+                print("\n".join([self._string_sg(x) for x in todo]))
+            else:
+                for sgid in todo:
+                    self.show_sg(sgid)
         else:
             print("\nNot found")
 
-    def show_sg(self, sg):
+    def show_sg(self, sg, showlist=False):
         if sg:
             if sg in self.sg_by_id:
                 sgid = sg
@@ -147,14 +166,15 @@ class Sg_deps(object):
             else:
                 print("\nError: cannot find the security group with name or id: " + sg + "\n")
                 exit(1)
-            print()
-            self._show(sgid, [], [])
-            self.show_obj(sgid)
-        else:
-            for sgid in self.sg_by_id:
+            if showlist:
+                print(self._string_sg(sgid))
+            else:
                 print("\n" + "-"*70)
                 self._show(sgid, [], [])
                 self.show_obj(sgid)
+        else:
+            for sgid in self.sg_by_id:
+                    self.show_sg(sgid, showlist=showlist)
 
     def _show(self, sgid, previous, indent):
         if not previous:
@@ -203,10 +223,15 @@ if __name__ == "__main__":
                aws_access_key_id = <your_access_key_here>
                aws_secret_access_key = <your_secret_key_here>'''))
     parser.add_argument("--region", choices=map(lambda x: x.name, regions()), help="region connect to")
-    parser.add_argument("--obsolete", action="store_true", help="show security group not used by any service")
+    parser.add_argument("--list",action="store_true", help="only output group id/name")
+    g = parser.add_mutually_exclusive_group()
+    g.add_argument("--obsolete", action="store_true", help="show security group not used by any service")
+    g.add_argument("--eni_only", action="store_true", help="show security group only used by eni (elastic network interface)")
     parser.add_argument("security_group", help="security group id or name, id takes precedence, if you have more than one group with same name, this program will show random one, you should use group id instead. leave empty for all groups", default="", nargs="?")
     args=parser.parse_args()
     if args.obsolete:
-        Sg_deps(args.region).show_obsolete_sg()
+        Sg_deps(args.region).show_obsolete_sg(showlist=args.list)
+    elif args.eni_only:
+        Sg_deps(args.region).show_eni_only_sg(showlist=args.list)
     else:
-        Sg_deps(args.region).show_sg(args.security_group)
+        Sg_deps(args.region).show_sg(args.security_group, showlist=args.list)
