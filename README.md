@@ -1,7 +1,9 @@
 # AWS security group dependency walker
 
 list AWS security group dependencies, so you know which security group has reference to other group
+
 it can be used to find out the security group used by which ec2/rds/redshift/elastcache/eni instance
+
 or you can list security groups not used by any of ec2/rds/redshift/elastcache/eni instance and can be safely deleted
 
 ------
