@@ -1,4 +1,4 @@
-# AWS security group dependency finder
+# AWS security group dependency walker
 
 list AWS security group dependencies
  
@@ -35,7 +35,7 @@ here's a few options:
 # usage:
 
 ``` 
-python sgdeps.py --region <region_name> security_group
+python sgdeps.py --region <region_name> [--obsolete] [security_group]
 ```
 
 # example:
@@ -51,4 +51,9 @@ sg-b4566ad1 (mingbotest-A)
 |     `-- sg-9b566afe (mingbotest-C2)
 |-- sg-8b566aee (mingbotest-B2)
 `-- sg-86566ae3 (mingbotest-B1)
+
+Used by:
+  ec2: i-7cf19ebf (Mingbotest-ec2-1)
+  ec2: i-7e219ebf (Mingbotest-ec2-1)
+  eni: eni-06ae977f
 ```
